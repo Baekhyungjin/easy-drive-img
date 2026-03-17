@@ -3,50 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <link rel="icon" href="https://drive.google.com/uc?export=view&id=1hVMj4iyCv7EVGycZFgUsfQsq9N4JTYtf">
-    
+    <link rel="icon" href="https://drive.google.com/thumbnail?id=1hVMj4iyCv7EVGycZFgUsfQsq9N4JTYtf&sz=w100">
     <meta property="og:title" content="이지 드라이브 이미지 변환기">
-    <meta property="og:description" content="5학년 개발자가 만든 구글 드라이브 이미지 직링크 생성기!">
-    <meta property="og:image" content="https://drive.google.com/uc?export=view&id=1hVMj4iyCv7EVGycZFgUsfQsq9N4JTYtf">
-    <meta property="og:url" content="https://baekhyungjin.github.io/easy-drive-img/">
-
+    <meta property="og:description" content="5학년 개발자가 만든 이미지 변환기!">
+    <meta property="og:image" content="https://drive.google.com/thumbnail?id=1hVMj4iyCv7EVGycZFgUsfQsq9N4JTYtf&sz=w800">
     <title>Drive Image Converter</title>
-    
     <style>
-        body { font-family: 'Malgun Gothic', sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; margin: 0 auto; background-color: #f0f4f8; }
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; margin: 0 auto; background-color: #f0f4f8; }
         .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
         h2 { color: #1a73e8; }
-        input { width: 100%; padding: 15px; margin: 15px 0; border: 2px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        input:focus { border-color: #4285f4; outline: none; }
-        button { width: 100%; padding: 15px; background-color: #4285f4; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
-        button:hover { background-color: #357ae8; }
+        input { width: 100%; padding: 15px; margin: 15px 0; border: 2px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background-color: #4285f4; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .result-box { margin-top: 25px; padding: 15px; background: #e8f0fe; border-radius: 8px; word-break: break-all; display: none; text-align: left; }
-        .preview-area { margin-top: 20px; }
-        img { max-width: 100%; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: none; margin: 0 auto; }
+        img { max-width: 100%; border-radius: 10px; display: none; margin: 20px auto 0; }
         .error-msg { color: #d93025; font-size: 14px; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
-
 <div class="container">
     <h2>🖼️ 이미지 변환기</h2>
-    <p>구글 드라이브 <strong>공유 링크</strong>를 넣어주세요!</p>
-    
-    <input type="text" id="driveLink" placeholder="https://drive.google.com/file/d/..." value="https://drive.google.com/file/d/1FaLIsl7YWYNSpQk0efFK_OJlq12o6iyF/view?usp=sharing">
+    <p>구글 드라이브 링크를 넣어주세요!</p>
+    <input type="text" id="driveLink" placeholder="https://drive.google.com/file/d/..." value="">
     <button onclick="convertLink()">이미지 확인하기</button>
-
     <div id="resultBox" class="result-box">
         <strong>✅ 변환된 직링크:</strong><br>
         <code id="directLinkText" style="display:block; margin-top:5px; color:#1967d2;"></code>
     </div>
-
-    <div class="preview-area">
-        <img id="previewImg" src="" alt="미리보기 결과">
-        <p id="errorMsg" class="error-msg">앗! 이미지가 안 보여요. 구글 드라이브에서 <strong>'링크가 있는 모든 사용자'</strong>로 공유 설정을 바꿨는지 확인해보세요!</p>
-    </div>
+    <img id="previewImg" src="" alt="미리보기 결과">
+    <p id="errorMsg" class="error-msg">앗! 여전히 안 보인다면 구글 드라이브의 '공유 설정'에서 <strong>[뷰어]</strong> 권한을 다시 확인해 보세요!</p>
 </div>
-
 <script>
     function convertLink() {
         const fullLink = document.getElementById('driveLink').value;
@@ -55,32 +40,27 @@
         const previewImg = document.getElementById('previewImg');
         const errorMsg = document.getElementById('errorMsg');
 
-        // 구글 드라이브 링크에서 ID만 뽑아내는 정규식
         const match = fullLink.match(/\/d\/(.+?)\//) || fullLink.match(/id=(.+?)(&|$)/);
         
         if (match && match[1]) {
             const fileId = match[1];
-            const directLink = `https://drive.google.com/uc?export=view&id=${fileId}`;
+            // 필살기: thumbnail 주소로 변경!
+            const directLink = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
 
-            // 결과 화면 업데이트
             directLinkText.innerText = directLink;
             resultBox.style.display = 'block';
-            
-            // 이미지 보여주기
             previewImg.src = directLink;
             previewImg.style.display = 'block';
             errorMsg.style.display = 'none';
 
-            // 이미지 로딩 실패 시 실행됨
             previewImg.onerror = function() {
                 this.style.display = 'none';
                 errorMsg.style.display = 'block';
             };
         } else {
-            alert("올바른 구글 드라이브 링크가 아니에요. 주소를 다시 확인해줄래?");
+            alert("주소를 다시 확인해줄래?");
         }
     }
 </script>
-
 </body>
 </html>
