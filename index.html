@@ -3,33 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>구글 드라이브 이미지 링크 변환기</title>
+    
+    <link rel="icon" href="https://drive.google.com/uc?export=view&id=1hVMj4iyCv7EVGycZFgUsfQsq9N4JTYtf">
+    
+    <meta property="og:title" content="이지 드라이브 이미지 변환기">
+    <meta property="og:description" content="5학년 개발자가 만든 구글 드라이브 이미지 직링크 생성기!">
+    <meta property="og:image" content="https://drive.google.com/uc?export=view&id=1hVMj4iyCv7EVGycZFgUsfQsq9N4JTYtf">
+    <meta property="og:url" content="https://baekhyungjin.github.io/easy-drive-img/">
+
+    <title>Drive Image Converter</title>
+    
     <style>
-        body { font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; margin: 0 auto; background-color: #f4f7f6; }
-        .container { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #4285f4; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        body { font-family: 'Malgun Gothic', sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; margin: 0 auto; background-color: #f0f4f8; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+        h2 { color: #1a73e8; }
+        input { width: 100%; padding: 15px; margin: 15px 0; border: 2px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        input:focus { border-color: #4285f4; outline: none; }
+        button { width: 100%; padding: 15px; background-color: #4285f4; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
         button:hover { background-color: #357ae8; }
-        .result-box { margin-top: 20px; padding: 15px; background: #e8f0fe; border-radius: 5px; word-break: break-all; display: none; }
-        img { max-width: 100%; margin-top: 20px; border: 1px solid #eee; border-radius: 5px; display: none; }
-        code { background: #eee; padding: 2px 5px; border-radius: 3px; font-size: 0.9em; }
+        .result-box { margin-top: 25px; padding: 15px; background: #e8f0fe; border-radius: 8px; word-break: break-all; display: none; text-align: left; }
+        .preview-area { margin-top: 20px; }
+        img { max-width: 100%; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: none; margin: 0 auto; }
+        .error-msg { color: #d93025; font-size: 14px; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Drive Image Link Converter</h2>
-    <p>구글 드라이브 <strong>공유 링크</strong>를 아래에 붙여넣으세요.</p>
+    <h2>🖼️ 이미지 변환기</h2>
+    <p>구글 드라이브 <strong>공유 링크</strong>를 넣어주세요!</p>
     
     <input type="text" id="driveLink" placeholder="https://drive.google.com/file/d/..." value="https://drive.google.com/file/d/1FaLIsl7YWYNSpQk0efFK_OJlq12o6iyF/view?usp=sharing">
-    <button onclick="convertLink()">이미지 적용하기</button>
+    <button onclick="convertLink()">이미지 확인하기</button>
 
     <div id="resultBox" class="result-box">
-        <strong>변환된 직링크:</strong><br>
-        <span id="directLinkText"></span>
+        <strong>✅ 변환된 직링크:</strong><br>
+        <code id="directLinkText" style="display:block; margin-top:5px; color:#1967d2;"></code>
     </div>
 
-    <img id="previewImg" src="" alt="미리보기">
+    <div class="preview-area">
+        <img id="previewImg" src="" alt="미리보기 결과">
+        <p id="errorMsg" class="error-msg">앗! 이미지가 안 보여요. 구글 드라이브에서 <strong>'링크가 있는 모든 사용자'</strong>로 공유 설정을 바꿨는지 확인해보세요!</p>
+    </div>
 </div>
 
 <script>
@@ -38,23 +53,31 @@
         const resultBox = document.getElementById('resultBox');
         const directLinkText = document.getElementById('directLinkText');
         const previewImg = document.getElementById('previewImg');
+        const errorMsg = document.getElementById('errorMsg');
 
-        // 정규식을 사용하여 파일 ID 추출
-        const match = fullLink.match(/\/d\/(.+?)\//);
+        // 구글 드라이브 링크에서 ID만 뽑아내는 정규식
+        const match = fullLink.match(/\/d\/(.+?)\//) || fullLink.match(/id=(.+?)(&|$)/);
         
         if (match && match[1]) {
             const fileId = match[1];
             const directLink = `https://drive.google.com/uc?export=view&id=${fileId}`;
 
-            // 결과 업데이트
+            // 결과 화면 업데이트
             directLinkText.innerText = directLink;
             resultBox.style.display = 'block';
             
-            // 이미지 미리보기 업데이트
+            // 이미지 보여주기
             previewImg.src = directLink;
             previewImg.style.display = 'block';
+            errorMsg.style.display = 'none';
+
+            // 이미지 로딩 실패 시 실행됨
+            previewImg.onerror = function() {
+                this.style.display = 'none';
+                errorMsg.style.display = 'block';
+            };
         } else {
-            alert("올바른 구글 드라이브 공유 링크 형식이 아닙니다.");
+            alert("올바른 구글 드라이브 링크가 아니에요. 주소를 다시 확인해줄래?");
         }
     }
 </script>
