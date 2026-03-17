@@ -4,165 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1088/1088537.png">
+    <link rel="icon" href="https://drive.google.com/thumbnail?id=1hVMj4iyCv7EVGycZFgUsfQsq9N4JTYtf&sz=w100">
     
-    <meta property="og:title" content="나만의 매직 이미지 변환기">
-    <meta property="og:description" content="구글 드라이브 없이도 척척! 5학년 개발자의 초능력 앱">
-    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/1088/1088537.png">
+    <meta property="og:title" content="이지 드라이브 이미지 변환기">
+    <meta property="og:description" content="5학년 개발자가 만든 구글 드라이브 이미지 직링크 생성기!">
+    <meta property="og:image" content="https://drive.google.com/thumbnail?id=1hVMj4iyCv7EVGycZFgUsfQsq9N4JTYtf&sz=w800">
     <meta property="og:url" content="https://baekhyungjin.github.io/easy-drive-img/">
 
-    <title>Magic Image Linker</title>
+    <title>Drive Image Converter</title>
     
     <style>
-        body {
-            font-family: 'Malgun Gothic', sans-serif;
-            background-color: #141518;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .main-container {
-            display: flex;
-            width: 850px;
-            height: 450px;
-            background-color: #2e3035;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-        }
-
-        /* 왼쪽: 드롭 구역 (Imgur 스타일) */
-        .drop-zone {
-            flex: 1.2;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 3px dashed rgba(255,255,255,0.5);
-            margin: 15px;
-            border-radius: 15px;
-            transition: 0.3s;
-        }
-
-        .drop-zone:hover {
-            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-            transform: scale(1.02);
-        }
-
-        /* 오른쪽: 결과 구역 */
-        .input-zone {
-            flex: 1;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            background-color: #3b3d42;
-        }
-
-        h2 { color: #00f2fe; margin-bottom: 5px; }
-        input {
-            width: 100%;
-            padding: 15px;
-            background: #232528;
-            border: 1px solid #555;
-            color: white;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-        }
-
-        button {
-            padding: 15px;
-            background-color: #1bb76e;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        button:hover { background-color: #169c5d; }
-
-        .result {
-            margin-top: 25px;
-            background: #1a1b1e;
-            padding: 15px;
-            border-radius: 8px;
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-
-        #previewImg {
-            max-width: 150px;
-            margin-top: 15px;
-            border-radius: 10px;
-            border: 2px solid #4facfe;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        body { font-family: 'Malgun Gothic', sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; margin: 0 auto; background-color: #f0f4f8; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+        h2 { color: #1a73e8; }
+        input { width: 100%; padding: 15px; margin: 15px 0; border: 2px solid #e0e0e0; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        input:focus { border-color: #4285f4; outline: none; }
+        button { width: 100%; padding: 15px; background-color: #4285f4; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        button:hover { background-color: #357ae8; }
+        .result-box { margin-top: 25px; padding: 15px; background: #e8f0fe; border-radius: 8px; word-break: break-all; display: none; text-align: left; }
+        .preview-area { margin-top: 20px; }
+        img { max-width: 100%; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: none; margin: 0 auto; }
+        .error-msg { color: #d93025; font-size: 14px; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 
-<div class="main-container">
-    <div class="drop-zone" id="dropZone">
-        <div style="font-size: 4rem; margin-bottom: 10px;">✨</div>
-        <p style="font-weight: bold; font-size: 1.2rem;">Drop image here</p>
-        <p style="font-size: 0.8rem; opacity: 0.8;">(or paste any link on the right)</p>
+<div class="container">
+    <h2>🖼️ 이미지 변환기</h2>
+    <p>구글 드라이브 <strong>공유 링크</strong>를 넣어주세요!</p>
+    
+    <input type="text" id="driveLink" placeholder="https://drive.google.com/file/d/..." value="https://drive.google.com/file/d/1FaLIsl7YWYNSpQk0efFK_OJlq12o6iyF/view?usp=sharing">
+    <button onclick="convertLink()">이미지 확인하기</button>
+
+    <div id="resultBox" class="result-box">
+        <strong>✅ 변환된 직링크:</strong><br>
+        <code id="directLinkText" style="display:block; margin-top:5px; color:#1967d2;"></code>
     </div>
 
-    <div class="input-zone">
-        <h2>Smart Linker</h2>
-        <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 20px;">No Database, No Stress!</p>
-        
-        <input type="text" id="driveLink" placeholder="Paste Drive link or image URL">
-        <button onclick="convertLink()">Get Direct Link</button>
-
-        <div class="result" id="resultBox">
-            <span style="color: #00f2fe; font-weight: bold;">Result:</span>
-            <div id="linkText" style="font-size: 0.8rem; margin-top: 5px; word-break: break-all;"></div>
-            <img id="previewImg" src="">
-        </div>
+    <div class="preview-area">
+        <img id="previewImg" src="" alt="미리보기 결과">
+        <p id="errorMsg" class="error-msg">앗! 이미지가 안 보여요. 구글 드라이브에서 <strong>'링크가 있는 모든 사용자'</strong>로 공유 설정을 바꿨는지 확인해보세요!</p>
     </div>
 </div>
 
 <script>
     function convertLink() {
-        const link = document.getElementById('driveLink').value;
+        const fullLink = document.getElementById('driveLink').value;
         const resultBox = document.getElementById('resultBox');
-        const linkText = document.getElementById('linkText');
+        const directLinkText = document.getElementById('directLinkText');
         const previewImg = document.getElementById('previewImg');
+        const errorMsg = document.getElementById('errorMsg');
 
-        // 1. 구글 드라이브 링크 처리
-        const match = link.match(/\/d\/(.+?)\//) || link.match(/id=(.+?)(&|$)/);
+        const match = fullLink.match(/\/d\/(.+?)\//) || fullLink.match(/id=(.+?)(&|$)/);
         
-        let finalLink = link; // 기본은 입력한 주소 그대로
-
         if (match && match[1]) {
-            // 구글 드라이브면 썸네일 방식으로 변환
-            finalLink = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+            const fileId = match[1];
+            
+            // ⭐ 이 부분을 'thumbnail' 방식으로 바꿔서 차단을 피합니다!
+            const directLink = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+
+            directLinkText.innerText = directLink;
+            resultBox.style.display = 'block';
+            
+            previewImg.src = directLink;
+            previewImg.style.display = 'block';
+            errorMsg.style.display = 'none';
+
+            previewImg.onerror = function() {
+                this.style.display = 'none';
+                errorMsg.style.display = 'block';
+            };
+        } else {
+            alert("올바른 구글 드라이브 링크가 아니에요. 주소를 다시 확인해줄래?");
         }
-
-        // 2. 결과 보여주기
-        linkText.innerText = finalLink;
-        previewImg.src = finalLink;
-        resultBox.style.display = 'block';
-        previewImg.style.display = 'block';
     }
-
-    // 드래그 기능 (보너스!)
-    const dropZone = document.getElementById('dropZone');
-    dropZone.ondrop = (e) => {
-        e.preventDefault();
-        alert("와! 사진을 직접 놓으셨네요! 나중에 이 사진을 서버에 저장하는 기능도 추가해볼까요?");
-    };
-    dropZone.ondragover = (e) => e.preventDefault();
 </script>
 
 </body>
